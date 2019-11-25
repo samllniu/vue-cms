@@ -78,9 +78,9 @@
     <el-dialog
       title="添加用户"
       :visible.sync="addDialogVisible"
-      width="50%"
+      width="40%"
       @click="addDialogcolsed">
-    <el-form :model="addForm" :rules="addrulesForm" ref="addFormRef" label-width="100px" class="demo-ruleForm">
+    <el-form :model="addForm" :rules="addrulesForm" ref="addFormRef" label-width="80px" class="demo-ruleForm">
       <el-form-item label="用户姓名" prop="username">
         <el-input v-model="addForm.username"></el-input>
       </el-form-item>
@@ -103,9 +103,9 @@
     <el-dialog
     title="提示"
     :visible.sync="editDialogVisible"
-    width="30%" @click="editDialogClosed">
-    <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px" class="demo-ruleForm">
-    <el-form-item label="用户姓名">
+    width="40%" @click="editDialogClosed">
+    <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="80px" class="demo-ruleForm">
+    <el-form-item label="用户姓名"> 
     <el-input v-model="editForm.username" disabled=""></el-input>
     </el-form-item>
     <el-form-item label="用户邮箱" prop="email">
@@ -215,7 +215,6 @@ export default {
       if (res.meta.status !== 200) return this.$message.console.error('获取用户列表失败')
       this.userList = res.data.users
       this.total = res.data.total
-      console.log(res)
     },
     handleSizeChange(newsize) {
       this.queryInfo.pagesize = newsize
@@ -237,7 +236,6 @@ export default {
     },
     addUser() {
       this.$refs.addFormRef.validate(valid => {
-        console.log(valid)
         if (!valid) return
         const { data: res } = this.$http.post('users', this.addForm)
         if (res.meta.status !== 200) {
@@ -248,9 +246,7 @@ export default {
       })
     },
     async ShoweditDialog(id) {
-      console.log(id)
       const { data: res } = await this.$http.get('users/' + id)
-      console.log(res)
       if (res.meta.status !== 200) {
         return this.$message.error('查询用户信息失败')
       }
@@ -262,7 +258,6 @@ export default {
     },
     editUserInfo() {
       this.$refs.editFormRef.validate(async valid => {
-        console.log(valid)
         if (!valid) return
         const { data: res } = await this.$http.put('users/' + this.editForm.id, {
           email: this.editForm.email,
