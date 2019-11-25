@@ -60,7 +60,7 @@
           <el-row>
             <el-button type="primary" icon="el-icon-edit" circle size="mini" @click="ShoweditDialog(scope.row.id)"></el-button>
             <el-button type="warning" icon="el-icon-star-off" circle size="mini"></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle size="mini"></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="removeUserById(scope.row.id)"></el-button>
           </el-row>
         </template>
       </el-table-column>
@@ -105,7 +105,7 @@
     :visible.sync="editDialogVisible"
     width="40%" @click="editDialogClosed">
     <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="80px" class="demo-ruleForm">
-    <el-form-item label="用户姓名"> 
+    <el-form-item label="用户姓名">
     <el-input v-model="editForm.username" disabled=""></el-input>
     </el-form-item>
     <el-form-item label="用户邮箱" prop="email">
@@ -269,6 +269,21 @@ export default {
         this.$message.success('更新用户成功！')
         this.getUserList()
       })
+    },
+    async removeUserById(id) {
+      const confirmResult = await this.$confirm('此操作将永久删除该用户, 是否继续?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      console.log(confirmResult)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+      }
+      const { data: res } = await this.$http.delete('users/' + id)
+      if (res.meta.status !== 200) return this.$message.error('删除用户失败')
+      this.$message.success('删除用户成功！')
+      this.getUserList()
     }
   }
 }
