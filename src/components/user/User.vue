@@ -125,7 +125,6 @@
 </template>
 
 <script>
-import { async } from 'q'
 export default {
   data() {
     var checkEmail = (rule, value, cb) => {
@@ -264,12 +263,12 @@ export default {
     editUserInfo() {
       this.$refs.editFormRef.validate(async valid => {
         console.log(valid)
-        if(!valid) return 
+        if (!valid) return
         const { data: res } = await this.$http.put('users/' + this.editForm.id, {
           email: this.editForm.email,
           mobile: this.editForm.mobile
         })
-        if (res.meta.status !== 200 ){
+        if (res.meta.status !== 200) {
           this.$$message.error('更新用户失败！')
         }
         this.$message.success('更新用户成功！')
