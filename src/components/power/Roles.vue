@@ -16,10 +16,19 @@
           <template slot-scope="scope">
              <el-row :class="['bdbottom', i1 ===0 ? 'bdtop' : '']" v-for="(item1,i1) in scope.row.children" :key="item1.id">
               <el-col :span="5">
-                <el-tag>{{item1.authName}}</el-tag>
+                <el-tag closable @close="removeRoleItem(scope.row, item1.id)">{{item1.authName}}</el-tag>
+                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
-                <i class="el-icon-caret-right"></i>
+                <el-row :class="[i2 === 0 ? '' : 'bdtop']" v-for="(item2,i2) in item1.children" :key="item2.id">
+                  <el-col :span="8">
+                    <el-tag type="warning" closable @close="removeRoleItem(scope.row, item2.id)">{{item2.authName}}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
+                  <el-col :span="16">
+                    <el-tag type="success" v-for="item3 in item2.children" :key="item3.id" closable @close="removeRoleItem(scope.row, item3.id)">{{item3.authName}}</el-tag>
+                  </el-col>
+                </el-row>
               </el-col>
              </el-row>
           </template>
@@ -56,6 +65,19 @@ export default {
         return this.$message.console.error(res.meta.msg)
       }
       console.log(res)
+      this.roleslist = res.data
+    },
+    async removeRoleItem(role, rightId) {
+      const result = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (result !== 'confirm') {
+        return this.$message.info('取消权限删除操作')
+      }
+      const { data: res } = this.$http.delete(`roles/${role.id}/rights/${rightId}`)
+      if (res.meta.status !== 200) return this.$message.error('删除权限操作失败')
       this.roleslist = res.data
     }
   }
