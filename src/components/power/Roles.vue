@@ -11,7 +11,7 @@
           <el-button type="primary" round>添加角色</el-button>
         </el-col>
       </el-row>
-      <el-table :data="roleslist" stripe style="width: 100%">
+      <el-table :data="rolelist" stripe style="width: 100%">
         <el-table-column type="expand">
           <template slot-scope="scope">
              <el-row :class="['bdbottom', i1 ===0 ? 'bdtop' : '']" v-for="(item1,i1) in scope.row.children" :key="item1.id">
@@ -44,14 +44,15 @@
           </template>
         </el-table-column>
       </el-table>
-       <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
+       <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%" @closed="setDialogClosed">
       <!-- 树形控件 -->
       <el-tree :data="rightslist"  :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys" ref="treeRef"></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRightDialogVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button type="primary" @click="allotRights">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色的对话框 -->
     </el-card>
   </div>
 </template>
@@ -60,7 +61,7 @@
 export default {
   data() {
     return {
-      roleslist: [],
+      rolelist: [],
       rightslist: [],
       setRightDialogVisible: false,
       treeProps: {
@@ -77,13 +78,16 @@ export default {
     this.getrolelist()
   },
   methods: {
+    // 获取所有角色的数据
     async getrolelist() {
       const { data: res } = await this.$http.get('roles')
       if (res.meta.status !== 200) {
-        return this.$message.console.error(res.meta.msg)
+        return this.$message.error('获取角色列表失败！')
       }
-      this.roleslist = res.data
+      this.rolelist = res.data
+      console.log(this.rolelist)
     },
+    // 删除角色
     async removeRoleItem(role, rightId) {
       const result = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -97,25 +101,51 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('删除权限操作失败')
       this.roleslist = res.data
     },
+    // 获取权限数据
     async settingRoles(roles) {
+      this.roleId = roles.id
       const { data: res } = await this.$http.get('rights/tree')
       if (res.meta.status !== 200) {
         return this.$message.error('获取权限数据失败')
       }
       this.getKey(roles, this.defKeys)
-      console.log('-----------')
-      console.log(res)
       this.rightslist = res.data
       this.setRightDialogVisible = true
     },
     // 使用地柜获取三级权限的ID
     getKey(node, arr) {
       if (!node.children) {
-         return arr.push(node.id)
+        return arr.push(node.id)
       }
       node.children.forEach(element => {
         this.getKey(element, arr)
       })
+    },
+    // 关闭权限树的时候清空权限树的数据
+    setDialogClosed() {
+      this.defKeys = []
+    },
+    // 在树形结构权限列表中增加用户的权限
+    async allotRights() {
+      const keys = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ]
+
+      const idStr = keys.join(',')
+
+      const { data: res } = await this.$http.post(
+        `roles/${this.roleId}/rights`,
+        { rids: idStr }
+      )
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配权限失败！')
+      }
+
+      this.$message.success('分配权限成功！')
+      this.getrolelist()
+      this.setRightDialogVisible = false
     }
   }
 }
