@@ -121,7 +121,6 @@ export default {
   data() {
     // 验证邮箱的规则
     var checkEmail = (rule, value, cb) => {
-      // 验证邮箱的正则表达式
       const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
 
       if (regEmail.test(value)) {
