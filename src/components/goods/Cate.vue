@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
     <el-breadcrumb-item>活动管理</el-breadcrumb-item>
     <el-breadcrumb-item>活动列表</el-breadcrumb-item>
     <el-breadcrumb-item>活动详情</el-breadcrumb-item>
@@ -130,12 +130,10 @@ export default {
     },
     handleSizeChange(newsize) {
       this.queryInfo.pagesize = newsize
-      console.log(newsize)
       this.getCateList()
     },
     handleCurrentChange(newpage) {
       this.queryInfo.newpage = newpage
-      console.log(newpage)
       this.getCateList()
     },
     showaddCatedialog() {
@@ -152,7 +150,6 @@ export default {
       this.parentcatelist = res.data
     },
     parentcateChange() {
-      console.log(this.selectedKeys)
       // 如果 selectedKeys 数组中的 length 大于0，证明选中的父级分类
       // 反之，就说明没有选中任何父级分类
       if (this.selectedKeys.length > 0) {
